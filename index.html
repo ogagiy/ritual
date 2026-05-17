@@ -1,201 +1,107 @@
 <h2 class="sr-only">Калькулятор ритуального заказа</h2>
 <style>
 :root {
-    --primary: #2c3e50;
+    --primary: #1a1a1a;
     --accent: #3498db;
     --success: #27ae60;
-    --bg: #f8f9fa;
+    --bg: #f4f4f7;
     --card-bg: #ffffff;
-    --border: #e0e0e0;
+    --border: #d1d1d1;
     --text-main: #2c3e50;
     --text-muted: #7f8c8d;
     --radius: 12px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background-color: var(--bg); color: var(--text-main); line-height: 1.5; }
+body { background-color: var(--bg); color: var(--text-main); font-family: -apple-system, system-ui, sans-serif; padding: 20px; }
 
-.wrap { 
-    max-width: 600px; 
-    margin: 0 auto; 
-    padding: 20px; 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+.wrap { max-width: 500px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 
-/* Степпер */
-.step-bar { 
-    display: flex; 
-    gap: 8px; 
-    margin-bottom: 24px; 
-}
+.step-bar { display: flex; gap: 5px; margin-bottom: 30px; }
 .step-pill { 
-    flex: 1; 
-    padding: 12px 4px; 
-    text-align: center; 
-    font-size: 13px; 
-    font-weight: 600; 
-    color: var(--text-muted); 
-    background: #eee; 
-    border-radius: 8px;
-    cursor: pointer; 
-    transition: all 0.2s ease;
+    flex: 1; padding: 12px 5px; text-align: center; font-size: 11px; font-weight: 600; 
+    color: var(--text-muted); background: #eee; border-radius: 6px; cursor: pointer; transition: 0.3s;
+    text-transform: uppercase;
 }
 .step-pill.active { background: var(--primary); color: #fff; }
 .step-pill.done { background: var(--success); color: #fff; }
-.step-num { display: none; } /* Скрыли номера для чистоты */
 
-.panel { display: none; animation: fadeIn 0.3s ease; }
+.panel { display: none; }
 .panel.visible { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Сетка выбора типа */
-.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
 .type-card { 
-    padding: 24px 16px; 
-    border: 2px solid transparent; 
-    border-radius: var(--radius); 
-    background: var(--card-bg); 
-    cursor: pointer; 
-    text-align: center; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    transition: all 0.2s;
+    padding: 30px 15px; border: 1.5px solid var(--border); border-radius: var(--radius); 
+    background: #fff; cursor: pointer; text-align: center; transition: all 0.2s;
 }
-.type-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-.type-card.sel { border-color: var(--accent); background: #f0f7ff; }
-.type-card .icon { font-size: 32px; margin-bottom: 12px; display: block; }
-.type-card .title { font-size: 16px; font-weight: 700; color: var(--primary); }
-.type-card .sub { font-size: 13px; color: var(--accent); font-weight: 600; margin-top: 4px; }
+.type-card.sel { border: 3px solid #000 !important; background: #f9f9f9; transform: scale(1.02); }
+.type-card .icon { font-size: 35px; margin-bottom: 10px; display: block; }
+.type-card .title { font-size: 16px; font-weight: 700; color: #000; }
+.type-card .sub { font-size: 13px; color: var(--text-muted); margin-top: 5px; }
 
-.section-label { 
-    font-size: 12px; 
-    font-weight: 700; 
-    color: var(--text-muted); 
-    text-transform: uppercase; 
-    letter-spacing: 1px; 
-    margin: 24px 0 12px; 
-}
+.section-label { font-size: 11px; font-weight: 800; color: #999; text-transform: uppercase; letter-spacing: 1px; margin: 25px 0 10px; }
 
-/* Список позиций */
-.item-block { background: var(--card-bg); border-radius: var(--radius); box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 12px; }
-.item-line { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 14px 16px; 
-    border-bottom: 1px solid #f0f0f0; 
-}
+.item-block { border: 1px solid #eee; border-radius: var(--radius); overflow: hidden; margin-bottom: 15px; }
+.item-line { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
 .item-line:last-child { border-bottom: none; }
-.item-name { font-size: 14px; color: var(--text-main); flex: 1; padding-right: 10px; }
+.item-name { font-size: 14px; font-weight: 500; color: #333; }
 
-/* Инпуты */
 input.price-in { 
-    width: 100px; 
-    text-align: right; 
-    padding: 8px; 
-    border: 1px solid var(--border); 
-    border-radius: 6px; 
-    background: #f9f9f9; 
-    color: var(--text-main); 
-    font-size: 14px; 
-    font-weight: 600;
+    width: 100px; padding: 8px; border: 1px solid var(--border); border-radius: 8px; 
+    text-align: right; font-weight: 700; font-size: 14px; background: #fafafa;
 }
-input.price-in:focus { border-color: var(--accent); outline: none; background: #fff; }
 
-/* Допы (чекбоксы-карточки) */
 .extras-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.extra-card { 
-    padding: 16px; 
-    border: 1px solid var(--border); 
-    border-radius: var(--radius); 
-    background: var(--card-bg); 
-    cursor: pointer; 
-    transition: 0.2s;
-}
-.extra-card.sel { border-color: var(--accent); background: #f0f7ff; box-shadow: inset 0 0 0 1px var(--accent); }
-.extra-name { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.extra-card { padding: 15px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; background: #fff; }
+.extra-card.sel { border: 2px solid #000; background: #f0f7ff; }
+.extra-name { font-size: 13px; font-weight: 600; margin-bottom: 10px; display: block; min-height: 32px; }
 
-.qty-btn { 
-    width: 30px; height: 30px; 
-    border: none; border-radius: 50%; 
-    background: var(--primary); color: #fff; 
-    font-size: 18px; cursor: pointer; 
-}
+.qty-btn { width: 30px; height: 30px; border: 1px solid #000; background: #fff; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.qty-num { margin: 0 10px; font-weight: 700; font-size: 16px; }
 
-/* Целевая сумма */
-.target-block { 
-    background: var(--primary); 
-    color: #fff;
-    border-radius: var(--radius); 
-    padding: 20px; 
-    margin-bottom: 20px;
-    text-align: center;
-}
-.target-in { 
-    font-size: 28px; 
-    font-weight: 800; 
-    background: transparent; 
-    border: none; 
-    border-bottom: 2px solid rgba(255,255,255,0.3); 
-    color: #fff; 
-    width: 180px; 
-    text-align: center;
-    margin: 10px 0;
-}
-.target-in:focus { outline: none; border-bottom-color: #fff; }
-
-/* Кнопки навигации */
-.nav-row { display: flex; gap: 12px; margin-top: 24px; }
+.nav-row { display: flex; gap: 10px; margin-top: 25px; }
 .nav-btn { 
-    flex: 1; 
-    padding: 16px; 
-    border: none; 
-    border-radius: var(--radius); 
-    font-size: 15px; 
-    font-weight: 700; 
-    cursor: pointer; 
-    transition: 0.2s;
+    flex: 1; padding: 16px; border: none; border-radius: var(--radius); 
+    font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s;
 }
-.nav-btn.primary { background: var(--accent); color: #fff; }
-.nav-btn:not(.primary) { background: #e0e0e0; color: var(--text-main); }
+.nav-btn.primary { background: #000; color: #fff; }
+.nav-btn:not(.primary) { background: #eee; color: #555; }
+
 .dist-btn { 
-    width: 100%; 
-    padding: 18px; 
-    background: var(--success); 
-    color: white; 
-    border: none; 
-    border-radius: var(--radius); 
-    font-size: 16px; 
-    font-weight: 700; 
-    margin-bottom: 20px;
-    cursor: pointer;
+    width: 100%; padding: 18px; background: var(--success); color: #fff; 
+    border: none; border-radius: var(--radius); font-size: 16px; font-weight: 700; margin-bottom: 20px; cursor: pointer;
 }
 
-/* Итоговые карточки */
-.total-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.total-card { background: #fff; padding: 15px; border-radius: var(--radius); border: 1px solid var(--border); }
-.total-card.main { grid-column: span 2; background: #f8f9fa; border: 2px solid var(--primary); }
-.tc-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
-.tc-val { font-size: 20px; font-weight: 800; }
-.tc-val.ok { color: var(--success); }
-.tc-val.err { color: #e74c3c; }
+.target-block { background: #f9f9f9; padding: 20px; border-radius: var(--radius); text-align: center; margin-bottom: 20px; border: 1px dashed #ccc; }
+.target-in { font-size: 30px; font-weight: 800; border: none; background: transparent; width: 180px; text-align: center; outline: none; }
 
-/* Статус */
-.status-pill { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-top: 5px; }
+.total-card { padding: 15px; border-radius: var(--radius); background: #f4f4f7; margin-bottom: 10px; }
+.total-card.main { background: #000; color: #fff; }
+.tc-label { font-size: 11px; opacity: 0.7; text-transform: uppercase; margin-bottom: 5px; }
+.tc-val { font-size: 22px; font-weight: 800; }
+
+.status-pill { display: inline-block; padding: 6px 15px; border-radius: 50px; font-size: 13px; font-weight: 700; margin-top: 10px; }
 .status-pill.ok { background: #d4edda; color: #155724; }
 .status-pill.warn { background: #fff3cd; color: #856404; }
 .status-pill.err { background: #f8d7da; color: #721c24; }
+
+.docs-toggle { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 15px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; cursor: pointer; background: #fff;
+}
+.docs-toggle.sel { border: 2px solid #000; background: #f9f9f9; }
 </style>
 
 <div class="wrap">
     <div class="step-bar">
-        <div class="step-pill active" id="sp1" onclick="goStep(1)">Тип заказа</div>
+        <div class="step-pill active" id="sp1" onclick="goStep(1)">Тип</div>
         <div class="step-pill" id="sp2" onclick="goStep(2)">Товары</div>
         <div class="step-pill" id="sp3" onclick="goStep(3)">Услуги</div>
-        <div class="step-pill" id="sp4" onclick="goStep(4)">Расчет</div>
+        <div class="step-pill" id="sp4" onclick="goStep(4)">Итог</div>
     </div>
 
     <div class="panel visible" id="panel1">
-        <div class="section-label">Что планируем?</div>
+        <div class="section-label">Выберите вид услуги</div>
         <div class="type-grid">
             <div class="type-card" id="tc-funeral" onclick="selType('funeral')">
                 <span class="icon">⚰️</span>
@@ -208,11 +114,13 @@ input.price-in:focus { border-color: var(--accent); outline: none; background: #
                 <div class="sub">от 120 000 ₽</div>
             </div>
         </div>
-        <button class="nav-btn primary" style="width:100%" onclick="goStep(2)">Продолжить</button>
+        <div class="nav-row">
+            <button class="nav-btn primary" onclick="goStep(2)">Далее</button>
+        </div>
     </div>
 
     <div class="panel" id="panel2">
-        <div class="section-label">Выберите дополнения</div>
+        <div class="section-label">Дополнительные товары</div>
         <div class="extras-grid" id="extras-grid"></div>
         <div class="nav-row">
             <button class="nav-btn" onclick="goStep(1)">Назад</button>
@@ -221,58 +129,281 @@ input.price-in:focus { border-color: var(--accent); outline: none; background: #
     </div>
 
     <div class="panel" id="panel3">
-        <div class="section-label">Услуги и документы</div>
+        <div class="section-label">Услуги</div>
         <div id="docs-list"></div>
         <div class="section-label">Морг</div>
         <div class="item-block">
             <div class="item-line">
-                <div class="item-name">Квитанция морга (платные услуги)</div>
+                <div class="item-name">Квитанция морга</div>
                 <input type="number" class="price-in" id="morgue-price" value="0" oninput="render()">
             </div>
         </div>
         <div class="nav-row">
             <button class="nav-btn" onclick="goStep(2)">Назад</button>
-            <button class="nav-btn primary" onclick="goStep(4)">К расчету цены</button>
+            <button class="nav-btn primary" onclick="goStep(4)">Рассчитать</button>
         </div>
     </div>
 
     <div class="panel" id="panel4">
         <div class="target-block">
-            <div class="tc-label" style="color: rgba(255,255,255,0.7)">Желаемый бюджет заказа</div>
+            <div class="tc-label">Желаемый бюджет</div>
             <input type="number" class="target-in" id="target-in" value="120000" oninput="render()">
-            <div style="font-size: 14px; opacity: 0.9;">рублей</div>
+            <span style="font-weight: 800; font-size: 20px;">₽</span>
         </div>
-        
+
         <button class="dist-btn" onclick="distribute()">✨ Подогнать цены под бюджет</button>
 
-        <div class="order-header" style="text-align: center; margin-bottom: 20px;">
-            <div class="order-title">Предварительная смета</div>
-            <div class="status-pill" id="status-pill">—</div>
-        </div>
+        <div style="text-align: center; margin-bottom: 20px;"><div class="status-pill" id="status-pill">—</div></div>
 
         <div class="section-label">Основные позиции</div>
         <div class="item-block" id="main-list"></div>
-
         <div id="docs-result-wrap"></div>
         <div id="extras-result-wrap"></div>
 
-        <div class="total-row">
-            <div class="total-card main">
-                <div class="tc-label">Итого к оплате</div>
-                <div class="tc-val" id="tc-total">—</div>
-            </div>
-            <div class="total-card">
-                <div class="tc-label">Цель</div>
-                <div class="tc-val" id="tc-target" style="font-size: 16px;">—</div>
-            </div>
-            <div class="total-card">
-                <div class="tc-label">Морг</div>
-                <div class="tc-val" id="tc-morgue" style="font-size: 16px;">—</div>
-            </div>
+        <div class="total-card main">
+            <div class="tc-label">Итого к оплате</div>
+            <div class="tc-val" id="tc-total">—</div>
         </div>
-
-        <div class="nav-row">
-            <button class="nav-btn" onclick="goStep(3)">Назад</button>
-        </div>
+        <div class="nav-row"><button class="nav-btn" onclick="goStep(3)">Назад</button></div>
     </div>
 </div>
+
+<script>
+const DEFS = {
+  funeral:[
+    {id:'coffin',   name:'Гроб',                 base:22000, w:8.0, cap:null},
+    {id:'bedding',  name:'Постель в гроб',       base:2500,  w:0.5, cap:null}, // w уменьшен
+    {id:'pillow',   name:'Подушка',              base:2000,  w:0.5, cap:null}, // w уменьшен
+    {id:'blanket',  name:'Покрывало',            base:3000,  w:0.5, cap:null}, // w уменьшен
+    {id:'slippers', name:'Тапочки',              base:800,   w:0.2, cap:null},
+    {id:'handles',  name:'Ручки (4 шт.)',        base:6000,  w:1.5, cap:null},
+    {id:'screws',   name:'Закрутки (2 шт.)',     base:2000,  w:0.5, cap:null},
+    {id:'wreaths',  name:'Венок (1 шт.)',        base:4500,  w:1.5, cap:null},
+    {id:'ribbons',  name:'Лента (1 шт.)',        base:1500,  w:0.8, cap:null},
+    {id:'cross',    name:'Крест + табличка',     base:7000,  w:3.5, cap:null}, // w увеличен для компенсации
+    {id:'brigade',  name:'Бригада сопровождения',base:13000, w:4.0, cap:null},
+    {id:'delivery', name:'Доставка',             base:3500,  w:1.2, cap:null},
+    {id:'hearse',   name:'Катафалк',             base:13000, w:4.5, cap:null},
+  ],
+  cremation:[
+    {id:'coffin',   name:'Гроб',                 base:18000, w:8.0, cap:null},
+    {id:'bedding',  name:'Постель в гроб',       base:2500,  w:0.5, cap:null},
+    {id:'pillow',   name:'Подушка',              base:2000,  w:0.5, cap:null},
+    {id:'blanket',  name:'Покрывало',            base:3000,  w:0.5, cap:null},
+    {id:'slippers', name:'Тапочки',              base:800,   w:0.2, cap:null},
+    {id:'latches',  name:'Защёлки',              base:1200,  w:0.4, cap:null},
+    {id:'crem_svc', name:'Кремация + урна',      base:38000, w:5.0, cap:40000},
+    {id:'brigade',  name:'Бригада сопровождения',base:11000, w:3.5, cap:null},
+    {id:'delivery', name:'Доставка',             base:3500,  w:1.2, cap:null},
+    {id:'hearse',   name:'Катафалк',             base:11000, w:4.0, cap:null},
+  ]
+};
+
+const EXTRAS_DEF = [
+  {id:'lid_cross', name:'Крест на крышку',   baseUnit:2500, w:1.0},
+  {id:'floret',    name:'Флоретка',          baseUnit:1500, w:0.5},
+  {id:'basket',    name:'Корзинка',          baseUnit:2500, w:1.0},
+  {id:'ex_wreath', name:'Доп. венок',        baseUnit:4500, w:0}, // Синхронизируется
+  {id:'ex_ribbon', name:'Доп. лента',        baseUnit:1500, w:0}, // Синхронизируется
+  {id:'clothes',   name:'Одежда',            baseUnit:8000, w:1.5}, // Одежда может расти
+  {id:'photoframe',name:'Фоторамка',         baseUnit:1800, w:0.3},
+];
+
+const DOCS_DEF = [
+  {id:'doc_complex', name:'Организация похорон'},
+  {id:'doc_docs',    name:'Оформление документов'},
+];
+
+let curType = 'funeral';
+let mainItems = [];
+let extrasState = {};
+let docsState = {};
+let uid = 100;
+
+function fmt(n){ return Math.round(n).toLocaleString('ru-RU') + ' ₽'; }
+function roundNice(n){ return n>=1000 ? Math.round(n/100)*100 : Math.round(n/10)*10; }
+
+function selType(t){
+  curType = t;
+  ['funeral','cremation'].forEach(x=> document.getElementById('tc-'+x).classList.toggle('sel', x===t));
+  mainItems = DEFS[t].map(d=>({...d, price:d.base, _uid:uid++}));
+  EXTRAS_DEF.forEach(e=>{ 
+    if(!extrasState[e.id]) extrasState[e.id]={sel:false,qty:1,price:e.baseUnit};
+  });
+  document.getElementById('target-in').value = t==='cremation'?120000:140000;
+  renderExtras(); renderDocs(); render();
+}
+
+function renderExtras(){
+  const g = document.getElementById('extras-grid');
+  g.innerHTML = EXTRAS_DEF.map(e=>{
+    const s = extrasState[e.id];
+    return `<div class="extra-card${s.sel?' sel':''}" onclick="toggleExtra('${e.id}')">
+      <span class="extra-name">${e.name}</span>
+      ${s.sel?`<div class="extra-qty" onclick="event.stopPropagation()">
+        <button class="qty-btn" onclick="changeQty('${e.id}',-1)">−</button>
+        <span class="qty-num">${s.qty}</span>
+        <button class="qty-btn" onclick="changeQty('${e.id}',1)">+</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleExtra(id){
+  extrasState[id].sel = !extrasState[id].sel;
+  renderExtras();
+}
+
+function changeQty(id,d){
+  extrasState[id].qty = Math.max(1, (extrasState[id].qty||1)+d);
+  renderExtras();
+}
+
+function renderDocs(){
+  const dl = document.getElementById('docs-list');
+  dl.innerHTML = DOCS_DEF.map(d=>{
+    const sel = docsState[d.id] && docsState[d.id].sel;
+    return `<div class="docs-toggle${sel?' sel':''}" onclick="toggleDoc('${d.id}')">
+      <span>${d.name}</span>
+      <span>${sel?'✅':'+'}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleDoc(id){
+  if(!docsState[id]) docsState[id]={sel:false,price:0};
+  docsState[id].sel = !docsState[id].sel;
+  renderDocs(); render();
+}
+
+function syncLinkedPrices() {
+    // Синхронизируем ленту и венок
+    const mainWreath = mainItems.find(it => it.id === 'wreaths');
+    const mainRibbon = mainItems.find(it => it.id === 'ribbons');
+    if(mainWreath && extrasState['ex_wreath']) extrasState['ex_wreath'].price = mainWreath.price;
+    if(mainRibbon && extrasState['ex_ribbon']) extrasState['ex_ribbon'].price = mainRibbon.price;
+}
+
+function distribute(){
+  const target = parseInt(document.getElementById('target-in').value)||0;
+  const morgue = parseFloat(document.getElementById('morgue-price').value)||0;
+  
+  // 1. Предварительный сброс на базу для одежды (чтобы не накапливать ошибку)
+  if(extrasState['clothes']) extrasState['clothes'].price = Math.max(8000, extrasState['clothes'].price);
+
+  // 2. Расчет базовых сумм
+  const docsTotal = DOCS_DEF.filter(d=>docsState[d.id]?.sel).reduce((s,d)=>s+docsState[d.id].price,0);
+  
+  // Функция для получения текущей суммы заказа (включая допы)
+  const getCurrentSum = () => {
+      syncLinkedPrices();
+      const exTotal = EXTRAS_DEF.filter(e=>extrasState[e.id].sel).reduce((s,e)=>s+extrasState[e.id].price*extrasState[e.id].qty,0);
+      const mTotal = mainItems.reduce((s,it)=>s+it.price,0);
+      return mTotal + exTotal + docsTotal + morgue;
+  };
+
+  // 3. Алгоритм распределения (несколько итераций для точности)
+  for(let i=0; i<3; i++) {
+      let currentTotal = getCurrentSum();
+      let diff = target - currentTotal;
+      let totalW = mainItems.reduce((s,it)=>s+it.w,0);
+      
+      // Добавляем вес одежды в общий вес, если она выбрана
+      if(extrasState['clothes']?.sel) totalW += EXTRAS_DEF.find(e=>e.id==='clothes').w;
+
+      mainItems.forEach(it=>{
+          let share = (it.w / totalW) * diff;
+          it.price = Math.max(it.base * 0.5, it.price + share); // Не даем падать слишком низко от базы
+          if(it.cap!==null) it.price = Math.min(it.price, it.cap);
+          it.price = roundNice(it.price);
+      });
+
+      if(extrasState['clothes']?.sel) {
+          let clothesDef = EXTRAS_DEF.find(e=>e.id==='clothes');
+          let share = (clothesDef.w / totalW) * diff;
+          extrasState['clothes'].price = Math.max(8000, extrasState['clothes'].price + share);
+          extrasState['clothes'].price = roundNice(extrasState['clothes'].price);
+      }
+  }
+
+  // 4. Финальная корректировка через гроб (самый весомый товар)
+  let finalDiff = target - getCurrentSum();
+  const coffin = mainItems.find(it=>it.id==='coffin') || mainItems[0];
+  coffin.price = Math.max(0, coffin.price + finalDiff);
+
+  render();
+}
+
+function priceEdit(uid_str, val, source){
+  let n = parseFloat(val)||0;
+  if(source==='main'){
+    const it = mainItems.find(i=>i._uid==uid_str);
+    if(it) it.price = n;
+  } else if(source==='doc'){
+    const did = uid_str.replace('doc_','');
+    if(docsState[did]) docsState[did].price = n;
+  } else if(source==='ext'){
+    const eid = uid_str.replace('ex_','');
+    if(eid === 'clothes' && n < 8000) n = 8000;
+    if(extrasState[eid]) extrasState[eid].price = n / extrasState[eid].qty;
+  }
+  render();
+}
+
+function render(){
+  syncLinkedPrices();
+
+  const selectedExtras = EXTRAS_DEF.filter(e=>extrasState[e.id].sel).map(e=>({
+    _uid:'ex_'+e.id, name:e.name+(extrasState[e.id].qty>1?` (${extrasState[e.id].qty} шт.)`:''), 
+    price:extrasState[e.id].price*extrasState[e.id].qty, eid:e.id
+  }));
+  const selectedDocs = DOCS_DEF.filter(d=>docsState[d.id]?.sel).map(d=>({
+    _uid:'doc_'+d.id, name:d.name, price:docsState[d.id].price, did:d.id
+  }));
+  
+  const morgue = parseFloat(document.getElementById('morgue-price').value)||0;
+  const mainTotal = mainItems.reduce((s,it)=>s+it.price,0);
+  const exTotal = selectedExtras.reduce((s,it)=>s+it.price,0);
+  const docTotal = selectedDocs.reduce((s,it)=>s+it.price,0);
+  const total = mainTotal + exTotal + docTotal + morgue;
+  const target = parseInt(document.getElementById('target-in').value)||0;
+
+  document.getElementById('main-list').innerHTML = mainItems.map(it=>`
+    <div class="item-line">
+      <span class="item-name">${it.name}</span>
+      <input type="number" class="price-in" value="${Math.round(it.price)}" oninput="priceEdit(${it._uid},this.value,'main')">
+    </div>`).join('');
+
+  const ew = document.getElementById('extras-result-wrap');
+  ew.innerHTML = selectedExtras.length ? `<div class="section-label">Дополнительно</div><div class="item-block">` + 
+    selectedExtras.map(it=>`<div class="item-line">
+      <span class="item-name">${it.name}</span>
+      <input type="number" class="price-in" value="${Math.round(it.price)}" oninput="priceEdit('${it._uid}',this.value,'ext')">
+    </div>`).join('') + `</div>` : '';
+
+  const dw = document.getElementById('docs-result-wrap');
+  dw.innerHTML = selectedDocs.length ? `<div class="section-label">Услуги</div><div class="item-block">` + 
+    selectedDocs.map(it=>`<div class="item-line">
+      <span class="item-name">${it.name}</span>
+      <input type="number" class="price-in" value="${Math.round(it.price)}" oninput="priceEdit('${it._uid}',this.value,'doc')">
+    </div>`).join('') + `</div>` : '';
+
+  document.getElementById('tc-total').textContent = fmt(total);
+  const diff = target - total;
+  const sp = document.getElementById('status-pill');
+  if(Math.abs(diff)<200){ sp.textContent='В цель'; sp.className='status-pill ok'; }
+  else if(diff>0){ sp.textContent='Остаток '+fmt(diff); sp.className='status-pill warn'; }
+  else { sp.textContent='Перебор '+fmt(-diff); sp.className='status-pill err'; }
+}
+
+function goStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('panel'+i).classList.toggle('visible', i===n);
+    document.getElementById('sp'+i).classList.toggle('active', i===n);
+    document.getElementById('sp'+i).classList.toggle('done', i<n);
+  });
+  if(n===4) render();
+}
+
+selType('funeral');
+</script>
