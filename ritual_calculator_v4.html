@@ -1,0 +1,431 @@
+
+<h2 class="sr-only">Калькулятор ритуального заказа — пошаговое составление и подгонка цен</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{padding:1.25rem 0;font-family:var(--font-sans);font-size:14px}
+.step-bar{display:flex;gap:0;margin-bottom:1.5rem;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.step-pill{flex:1;padding:10px 8px;text-align:center;font-size:12px;font-weight:500;color:var(--color-text-tertiary);background:var(--color-background-primary);cursor:pointer;border-right:0.5px solid var(--color-border-tertiary);transition:background 0.15s,color 0.15s}
+.step-pill:last-child{border-right:none}
+.step-pill.done{color:var(--color-text-success);background:var(--color-background-success)}
+.step-pill.active{color:var(--color-text-primary);background:var(--color-background-secondary);font-weight:500}
+.step-num{display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--color-background-tertiary);color:var(--color-text-secondary);font-size:11px;line-height:18px;text-align:center;margin-right:5px}
+.step-pill.active .step-num{background:var(--color-text-primary);color:var(--color-background-primary)}
+.step-pill.done .step-num{background:var(--color-background-success);color:var(--color-text-success)}
+
+.panel{display:none}
+.panel.visible{display:block}
+
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.type-card{padding:20px 16px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);cursor:pointer;text-align:center;transition:all 0.15s}
+.type-card:hover{background:var(--color-background-secondary)}
+.type-card.sel{border:1.5px solid var(--color-border-primary);background:var(--color-background-secondary)}
+.type-card .icon{font-size:28px;color:var(--color-text-secondary);margin-bottom:8px}
+.type-card .title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.type-card .sub{font-size:12px;color:var(--color-text-tertiary);margin-top:3px}
+
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin:1.25rem 0 0.6rem}
+.item-block{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:6px}
+.item-line{display:grid;grid-template-columns:1fr 90px;gap:0;align-items:center;padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.item-line:last-child{border-bottom:none}
+.item-name{font-size:13px;color:var(--color-text-primary)}
+.item-val{font-size:13px;font-weight:500;color:var(--color-text-primary);text-align:right}
+.item-val.editable{cursor:pointer}
+input.price-in{width:100%;text-align:right;padding:3px 6px;border:0.5px solid var(--color-border-primary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:13px;font-weight:500}
+
+.extras-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.extra-card{padding:10px 12px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:6px}
+.extra-card:hover{background:var(--color-background-secondary)}
+.extra-card.sel{border:1px solid var(--color-border-info);background:var(--color-background-info)}
+.extra-card.sel .extra-name{color:var(--color-text-info)}
+.extra-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.extra-qty{display:flex;align-items:center;gap:6px;margin-top:2px}
+.qty-btn{width:24px;height:24px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.qty-num{font-size:13px;font-weight:500;min-width:20px;text-align:center;color:var(--color-text-primary)}
+
+.docs-toggle{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);cursor:pointer;margin-bottom:6px}
+.docs-toggle .label{font-size:13px;color:var(--color-text-primary)}
+.docs-toggle.sel{border-color:var(--color-border-info);background:var(--color-background-info)}
+.docs-toggle.sel .label{color:var(--color-text-info)}
+.chk{width:18px;height:18px;border:0.5px solid var(--color-border-secondary);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--color-text-tertiary)}
+.docs-toggle.sel .chk{background:var(--color-background-primary);color:var(--color-text-success);border-color:var(--color-border-success)}
+
+.target-block{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:1rem}
+.target-row{display:flex;align-items:center;gap:12px}
+.target-label{font-size:13px;color:var(--color-text-secondary);white-space:nowrap}
+.target-in{font-size:22px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);width:160px;text-align:right;padding:0}
+.target-in:focus{outline:none}
+
+.dist-btn{width:100%;padding:12px;border:0.5px solid var(--color-border-primary);border-radius:var(--border-radius-lg);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:14px;font-weight:500;cursor:pointer;margin-bottom:1rem}
+.dist-btn:hover{background:var(--color-background-tertiary)}
+
+.order-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
+.order-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.status-pill{font-size:12px;padding:4px 10px;border-radius:20px}
+.status-pill.ok{background:var(--color-background-success);color:var(--color-text-success)}
+.status-pill.warn{background:var(--color-background-warning);color:var(--color-text-warning)}
+.status-pill.err{background:var(--color-background-danger);color:var(--color-text-danger)}
+
+.total-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:1rem}
+.total-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+.total-card.main{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary)}
+.total-card.morgue{background:var(--color-background-primary);border:0.5px dashed var(--color-border-secondary)}
+.tc-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+.tc-val{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.tc-val.ok{color:var(--color-text-success)}
+.tc-val.err{color:var(--color-text-danger)}
+
+.nav-row{display:flex;gap:10px;margin-top:1.25rem}
+.nav-btn{flex:1;padding:10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);color:var(--color-text-primary);font-size:13px;font-weight:500;cursor:pointer}
+.nav-btn.primary{background:var(--color-background-secondary)}
+.nav-btn:hover{background:var(--color-background-tertiary)}
+
+.morgue-row-inp{display:grid;grid-template-columns:1fr 120px;gap:10px;align-items:center;padding:10px 14px;background:var(--color-background-primary);border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);margin-top:8px}
+.morgue-label{font-size:13px;color:var(--color-text-secondary)}
+</style>
+
+<div class="wrap">
+<div class="step-bar">
+  <div class="step-pill active" id="sp1" onclick="goStep(1)"><span class="step-num">1</span>Тип</div>
+  <div class="step-pill" id="sp2" onclick="goStep(2)"><span class="step-num">2</span>Допы</div>
+  <div class="step-pill" id="sp3" onclick="goStep(3)"><span class="step-num">3</span>Услуги</div>
+  <div class="step-pill" id="sp4" onclick="goStep(4)"><span class="step-num">4</span>Цена</div>
+</div>
+
+<div class="panel visible" id="panel1">
+  <div class="section-label">Выберите тип заказа</div>
+  <div class="type-grid">
+    <div class="type-card" id="tc-funeral" onclick="selType('funeral')">
+      <div class="icon"><i class="ti ti-flower" aria-hidden="true"></i></div>
+      <div class="title">Похороны</div>
+      <div class="sub">от 140 000 ₽</div>
+    </div>
+    <div class="type-card" id="tc-cremation" onclick="selType('cremation')">
+      <div class="icon"><i class="ti ti-flame" aria-hidden="true"></i></div>
+      <div class="title">Кремация</div>
+      <div class="sub">от 120 000 ₽</div>
+    </div>
+  </div>
+  <div class="nav-row"><button class="nav-btn primary" onclick="goStep(2)"><i class="ti ti-arrow-right" aria-hidden="true" style="margin-right:6px"></i>Далее</button></div>
+</div>
+
+<div class="panel" id="panel2">
+  <div class="section-label">Дополнительные позиции</div>
+  <div class="extras-grid" id="extras-grid"></div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="goStep(1)"><i class="ti ti-arrow-left" aria-hidden="true" style="margin-right:6px"></i>Назад</button>
+    <button class="nav-btn primary" onclick="goStep(3)">Далее<i class="ti ti-arrow-right" aria-hidden="true" style="margin-left:6px"></i></button>
+  </div>
+</div>
+
+<div class="panel" id="panel3">
+  <div class="section-label">Дополнительные услуги</div>
+  <div id="docs-list"></div>
+  <div class="section-label" style="margin-top:1rem">Квитанция морга</div>
+  <div class="morgue-row-inp">
+    <div class="morgue-label"><i class="ti ti-receipt" aria-hidden="true" style="margin-right:6px;font-size:15px"></i>Квитанция морга (отдельный платёж)</div>
+    <input type="number" class="price-in" id="morgue-price" value="0" step="500" oninput="render()">
+  </div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="goStep(2)"><i class="ti ti-arrow-left" aria-hidden="true" style="margin-right:6px"></i>Назад</button>
+    <button class="nav-btn primary" onclick="goStep(4)">Перейти к цене<i class="ti ti-arrow-right" aria-hidden="true" style="margin-left:6px"></i></button>
+  </div>
+</div>
+
+<div class="panel" id="panel4">
+  <div class="target-block">
+    <div class="target-row">
+      <span class="target-label"><i class="ti ti-target" aria-hidden="true" style="margin-right:6px;font-size:15px"></i>Целевая сумма</span>
+      <input type="number" class="target-in" id="target-in" value="120000" step="1000" oninput="render()">
+      <span style="font-size:16px;color:var(--color-text-secondary)">₽</span>
+    </div>
+  </div>
+  <button class="dist-btn" onclick="distribute()"><i class="ti ti-wand" aria-hidden="true" style="margin-right:8px"></i>Подогнать цены под цель</button>
+
+  <div class="order-header">
+    <div class="order-title">Состав заказа</div>
+    <div class="status-pill" id="status-pill">—</div>
+  </div>
+
+  <div class="section-label">Основные позиции</div>
+  <div class="item-block" id="main-list"></div>
+
+  <div id="docs-result-wrap"></div>
+  <div id="extras-result-wrap"></div>
+
+  <div class="total-row">
+    <div class="total-card main">
+      <div class="tc-label">Итого по чеку</div>
+      <div class="tc-val" id="tc-total">—</div>
+    </div>
+    <div class="total-card">
+      <div class="tc-label">Цель</div>
+      <div class="tc-val" id="tc-target">—</div>
+    </div>
+    <div class="total-card morgue">
+      <div class="tc-label">Квитанция морга</div>
+      <div class="tc-val" id="tc-morgue">—</div>
+    </div>
+  </div>
+
+  <div class="nav-row" style="margin-top:1rem">
+    <button class="nav-btn" onclick="goStep(3)"><i class="ti ti-arrow-left" aria-hidden="true" style="margin-right:6px"></i>Назад</button>
+  </div>
+</div>
+</div>
+
+<script>
+const DEFS = {
+  funeral:[
+    {id:'coffin',   name:'Гроб',                             base:22000, w:8.0, cap:null},
+    {id:'bedding',  name:'Постель в гроб',                   base:2500,  w:1.5, cap:null},
+    {id:'pillow',   name:'Подушка',                          base:2000,  w:1.0, cap:null},
+    {id:'blanket',  name:'Покрывало',                        base:3000,  w:1.2, cap:null},
+    {id:'slippers', name:'Тапочки',                          base:800,   w:0.4, cap:null},
+    {id:'handles',  name:'Ручки (4 шт.)',                    base:6000,  w:1.5, cap:null},
+    {id:'screws',   name:'Закрутки (2 шт.)',                 base:2000,  w:0.5, cap:null},
+    {id:'wreaths',  name:'Венки (2 шт.)',                    base:9000,  w:2.5, cap:null},
+    {id:'ribbons',  name:'Ленты заказные (2 шт.)',           base:3000,  w:0.8, cap:null},
+    {id:'cross',    name:'Крест + табличка',                 base:7000,  w:2.0, cap:null},
+    {id:'brigade',  name:'Бригада сопровождения',            base:13000, w:4.0, cap:null},
+    {id:'delivery', name:'Доставка принадлежностей',         base:3500,  w:1.2, cap:null},
+    {id:'hearse',   name:'Услуги катафального транспорта',   base:13000, w:4.5, cap:null},
+  ],
+  cremation:[
+    {id:'coffin',   name:'Гроб',                             base:18000, w:8.0, cap:null},
+    {id:'bedding',  name:'Постель в гроб',                   base:2500,  w:1.5, cap:null},
+    {id:'pillow',   name:'Подушка',                          base:2000,  w:1.0, cap:null},
+    {id:'blanket',  name:'Покрывало',                        base:3000,  w:1.2, cap:null},
+    {id:'slippers', name:'Тапочки',                          base:800,   w:0.4, cap:null},
+    {id:'latches',  name:'Защёлки',                          base:1200,  w:0.4, cap:null},
+    {id:'crem_svc', name:'Услуги кремации (кремация + урна)',base:38000, w:5.0, cap:40000},
+    {id:'brigade',  name:'Бригада сопровождения',            base:11000, w:3.5, cap:null},
+    {id:'delivery', name:'Доставка принадлежностей',         base:3500,  w:1.2, cap:null},
+    {id:'hearse',   name:'Услуги катафального транспорта',   base:11000, w:4.0, cap:null},
+  ]
+};
+
+const EXTRAS_DEF = [
+  {id:'lid_cross', name:'Крест на крышку гроба', baseUnit:2500},
+  {id:'floret',    name:'Флоретка на гроб',       baseUnit:1500},
+  {id:'basket',    name:'Корзинка',               baseUnit:2500},
+  {id:'ex_wreath', name:'Доп. венок',             baseUnit:4500},
+  {id:'ex_ribbon', name:'Доп. лента',             baseUnit:1200},
+  {id:'clothes',   name:'Одежда',                 baseUnit:3500},
+  {id:'photoframe',name:'Фоторамка с фото',       baseUnit:1800},
+];
+const DOCS_DEF = [
+  {id:'doc_complex', name:'Комплекс услуг по организации похорон'},
+  {id:'doc_docs',    name:'Комплекс услуг по оформлению документов'},
+];
+
+let curType = 'funeral';
+let mainItems = [];
+let extrasState = {};
+let docsState = {};
+let uid = 100;
+let step = 1;
+
+function fmt(n){ return Math.round(n).toLocaleString('ru-RU') + ' ₽'; }
+
+function roundNice(n){
+  if(n>=100000) return Math.round(n/1000)*1000;
+  if(n>=20000)  return Math.round(n/500)*500;
+  if(n>=5000)   return Math.round(n/100)*100;
+  if(n>=1000)   return Math.round(n/50)*50;
+  return Math.round(n/10)*10;
+}
+
+function selType(t){
+  curType = t;
+  ['funeral','cremation'].forEach(x=>{
+    document.getElementById('tc-'+x).classList.toggle('sel', x===t);
+  });
+  mainItems = DEFS[t].map(d=>({...d, price:d.base, _uid:uid++}));
+  EXTRAS_DEF.forEach(e=>{ if(!extrasState[e.id]) extrasState[e.id]={sel:false,qty:1,price:e.baseUnit}; });
+  document.getElementById('target-in').value = t==='cremation'?120000:140000;
+  renderExtras();
+  renderDocs();
+  render();
+}
+
+function renderExtras(){
+  const g = document.getElementById('extras-grid');
+  if(!g) return;
+  g.innerHTML = EXTRAS_DEF.map(e=>{
+    const s = extrasState[e.id]||{sel:false,qty:1};
+    return `<div class="extra-card${s.sel?' sel':''}" id="ec-${e.id}" onclick="toggleExtra('${e.id}')">
+      <div class="extra-name">${e.name}</div>
+      ${s.sel?`<div class="extra-qty" onclick="event.stopPropagation()">
+        <button class="qty-btn" onclick="changeQty('${e.id}',-1)">−</button>
+        <span class="qty-num">${s.qty}</span>
+        <button class="qty-btn" onclick="changeQty('${e.id}',1)">+</button>
+        <span style="font-size:11px;color:var(--color-text-tertiary)">шт.</span>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleExtra(id){
+  if(!extrasState[id]) extrasState[id]={sel:false,qty:1,price:EXTRAS_DEF.find(e=>e.id===id).baseUnit};
+  extrasState[id].sel = !extrasState[id].sel;
+  renderExtras();
+}
+
+function changeQty(id,d){
+  extrasState[id].qty = Math.max(1, (extrasState[id].qty||1)+d);
+  renderExtras();
+}
+
+function renderDocs(){
+  const dl = document.getElementById('docs-list');
+  if(!dl) return;
+  dl.innerHTML = DOCS_DEF.map(d=>{
+    const sel = docsState[d.id]&&docsState[d.id].sel;
+    return `<div class="docs-toggle${sel?' sel':''}" onclick="toggleDoc('${d.id}')">
+      <span class="label">${d.name}</span>
+      <span class="chk">${sel?'<i class="ti ti-check" aria-hidden="true"></i>':'+'}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleDoc(id){
+  if(!docsState[id]) docsState[id]={sel:false,price:0};
+  docsState[id].sel = !docsState[id].sel;
+  renderDocs();
+  render();
+}
+
+function getExtrasItems(){
+  return EXTRAS_DEF.filter(e=>extrasState[e.id]&&extrasState[e.id].sel).map(e=>{
+    const s = extrasState[e.id];
+    return {_uid:'ex_'+e.id, name:e.name+(s.qty>1?' ('+s.qty+' шт.)':''), price:(s.price||e.baseUnit)*s.qty, baseUnit:e.baseUnit, qty:s.qty, eid:e.id};
+  });
+}
+function getDocsItems(){
+  return DOCS_DEF.filter(d=>docsState[d.id]&&docsState[d.id].sel).map(d=>({
+    _uid:'doc_'+d.id, name:d.name, price:docsState[d.id].price||0, did:d.id
+  }));
+}
+
+function distribute(){
+  const target = parseInt(document.getElementById('target-in').value)||0;
+  const extrasTotal = getExtrasItems().reduce((s,it)=>s+(parseFloat(it.price)||0),0);
+  const docsItems = getDocsItems();
+  const docsTotal = docsItems.reduce((s,it)=>s+(parseFloat(it.price)||0),0);
+  const morgue = parseFloat(document.getElementById('morgue-price').value)||0;
+  const budget = target - extrasTotal - docsTotal;
+
+  const baseSum = mainItems.reduce((s,it)=>s+it.base,0);
+  const surplus = budget - baseSum;
+  const totalW  = mainItems.reduce((s,it)=>s+it.w,0);
+
+  mainItems.forEach(it=>{
+    let raw;
+    if(surplus<=0){
+      raw = (it.base/baseSum)*budget;
+    } else {
+      raw = it.base + (it.w/totalW)*surplus;
+    }
+    if(it.cap!==null) raw = Math.min(raw, it.cap);
+    it.price = roundNice(Math.max(0, raw));
+  });
+
+  let mainTotal = mainItems.reduce((s,it)=>s+it.price,0);
+  let diff = target - mainTotal - extrasTotal - docsTotal;
+  if(diff!==0){
+    const coffin = mainItems.find(it=>it.id==='coffin')||mainItems[0];
+    coffin.price = Math.max(0, coffin.price+diff);
+  }
+
+  render();
+}
+
+function priceEdit(uid_str, val, source){
+  if(source==='main'){
+    const it = mainItems.find(i=>i._uid==uid_str);
+    if(it) it.price = parseFloat(val)||0;
+  } else if(source==='doc'){
+    const did = uid_str.replace('doc_','');
+    if(docsState[did]) docsState[did].price = parseFloat(val)||0;
+  } else if(source==='ext'){
+    const eid = uid_str.replace('ex_','');
+    if(extrasState[eid]) extrasState[eid].price = (parseFloat(val)||0)/((extrasState[eid].qty)||1);
+  }
+  render();
+}
+
+function render(){
+  const allExtras = getExtrasItems();
+  const allDocs = getDocsItems();
+  const morgue = parseFloat(document.getElementById('morgue-price').value)||0;
+  const total = mainItems.reduce((s,it)=>s+(parseFloat(it.price)||0),0)
+              + allExtras.reduce((s,it)=>s+(parseFloat(it.price)||0),0)
+              + allDocs.reduce((s,it)=>s+(parseFloat(it.price)||0),0);
+  const target = parseInt(document.getElementById('target-in').value)||0;
+  const diff = target - total;
+
+  const ml = document.getElementById('main-list');
+  if(ml){
+    ml.innerHTML = mainItems.map(it=>`
+      <div class="item-line">
+        <div class="item-name">${it.name}</div>
+        <input type="number" class="price-in" value="${Math.round(it.price)}" step="50"
+          oninput="priceEdit(${it._uid},this.value,'main')" style="width:90px">
+      </div>`).join('');
+  }
+
+  const dw = document.getElementById('docs-result-wrap');
+  if(dw){
+    if(allDocs.length){
+      dw.innerHTML = `<div class="section-label">Услуги</div><div class="item-block">`+
+        allDocs.map(it=>`<div class="item-line">
+          <div class="item-name">${it.name}</div>
+          <input type="number" class="price-in" value="${Math.round(it.price)}" step="500"
+            oninput="priceEdit('${it._uid}',this.value,'doc')" style="width:90px">
+        </div>`).join('')+`</div>`;
+    } else { dw.innerHTML=''; }
+  }
+
+  const ew = document.getElementById('extras-result-wrap');
+  if(ew){
+    if(allExtras.length){
+      ew.innerHTML = `<div class="section-label">Дополнительно</div><div class="item-block">`+
+        allExtras.map(it=>`<div class="item-line">
+          <div class="item-name">${it.name}</div>
+          <input type="number" class="price-in" value="${Math.round(it.price)}" step="50"
+            oninput="priceEdit('${it._uid}',this.value,'ext')" style="width:90px">
+        </div>`).join('')+`</div>`;
+    } else { ew.innerHTML=''; }
+  }
+
+  const tv = document.getElementById('tc-total');
+  if(tv){
+    tv.textContent = fmt(total);
+    tv.className = 'tc-val'+(Math.abs(diff)<200?' ok':diff<0?' err':'');
+  }
+  const tgt = document.getElementById('tc-target');
+  if(tgt) tgt.textContent = fmt(target);
+  const tmg = document.getElementById('tc-morgue');
+  if(tmg) tmg.textContent = fmt(morgue);
+
+  const sp = document.getElementById('status-pill');
+  if(sp){
+    if(Math.abs(diff)<200){ sp.textContent='В цель'; sp.className='status-pill ok'; }
+    else if(diff>0){ sp.textContent='Не хватает '+fmt(diff); sp.className='status-pill warn'; }
+    else { sp.textContent='Перебор '+fmt(-diff); sp.className='status-pill err'; }
+  }
+}
+
+function goStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('panel'+i).classList.toggle('visible', i===n);
+    const pill = document.getElementById('sp'+i);
+    pill.classList.toggle('active', i===n);
+    pill.classList.toggle('done', i<n);
+  });
+  step = n;
+  if(n===4) render();
+}
+
+selType('funeral');
+</script>
